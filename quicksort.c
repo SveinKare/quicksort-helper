@@ -9,12 +9,30 @@ void swap(int *i, int *j) {
     *i = k;
 }
 
-int median3Sort(int *list, int iLeft, int iRight) {
-    int mid = (iLeft + iRight) / 2;
-    if (list[iLeft] > list[mid]) swap(&list[iLeft], &list[mid]);
-    if (list[mid] > list[iRight]) {
-        swap(&list[mid], &list[iRight]);
-        if (list[iLeft] > list[mid]) swap(&list[iLeft], &list[mid]);
+//Checks if the given array is sorted correctly. 
+int isSortedCorrectly(int *list, int l, int r) {
+    for (int i = l; i < r; i++) {
+        if (list[i] > list[i + 1]) return 0;
+    }
+    return 1;
+}
+
+//This function is a bit wonky, but it essentially works as an insertion sort for 4 discontiguous elements. 
+int sort4(int *list, int iLeft, int iRight) {
+    int diff = iRight - iLeft;
+    int mid = iLeft + (diff >> 2)*3;
+    int quart = iLeft + (diff >> 2);
+    if (list[quart] < list[iLeft]) swap(&list[quart], &list[iLeft]);
+    if (list[mid] < list[quart]) {
+        swap(&list[mid], &list[quart]);
+        if (list[quart] < list[iLeft]) swap(&list[quart], &list[iLeft]);
+    }
+    if (list[iRight] < list[mid]) {
+        swap(&list[iRight], &list[mid]);
+        if (list[mid] < list[quart]) {
+            swap(&list[mid], &list[quart]);
+            if (list[quart] < list[iLeft]) swap(&list[quart], &list[iLeft]);
+        }
     }
     return mid; //Returns the index of the pivot
 }
@@ -33,7 +51,7 @@ void insertionSort(int *list, int iLeft, int iRight) {
 
 int split(int *list, int iLeft, int iRight) {
     int leftPointer, rightPointer;
-    int mid = median3Sort(list, iLeft, iRight);
+    int mid = sort4(list, iLeft, iRight);
     int pivotValue = list[mid];
     swap(&list[mid], &list[iRight - 1]);
     for (leftPointer = iLeft, rightPointer = iRight - 1;;) {
@@ -43,7 +61,7 @@ int split(int *list, int iLeft, int iRight) {
         swap(&list[leftPointer], &list[rightPointer]);
     }
     swap(&list[leftPointer], &list[iRight - 1]);
-    return leftPointer; //This is the current index of the pivot, and is used to split the list. 
+    return leftPointer; //This is the current index of the pivot, and is used for the recursive calls. 
 }
 
 void quicksort(int *list, int iLeft, int iRight) {
@@ -56,12 +74,7 @@ void quicksort(int *list, int iLeft, int iRight) {
     }
 }
 
-int isSortedCorrectly(int *list, int length) {
-    for (int i = 0; i < length - 1; i++) {
-        if (list[i] > list[i + 1]) return 0;
-    }
-    return 1;
-}
+
 
 int main() {
     const int listLength = 1000000;
@@ -75,13 +88,18 @@ int main() {
             test[i] = rand();
         }
         quicksort(test, 0, listLength - 1);
-        if (!isSortedCorrectly(test, listLength)) {
-            printf("Incorrect sort!");
+        if (!isSortedCorrectly(test, 0, listLength - 1)) {
+            printf("Incorrect sort!\n");
             break;
         }
         end = clock();
         rounds++;
     }
     printf("%.2f ms per round.\n", ((double) (end - start)) / rounds);
+ 
+/*     int test[] = {9, 2, 3, 4, 5, 6, 7, 8, 9, 9};
+    if (isSortedCorrectly(test, 0, 9)) printf("Success!\n");
+    else printf("Failure!\n"); */
+
     return 0;
 }
