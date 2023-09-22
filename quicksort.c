@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <pthread.h>
+
+struct qsargs {
+    int *list;
+    int iLeft;
+    int iRight;
+};
 
 //Swaps the places of the values at i and j
 void swap(int *i, int *j) {
@@ -46,11 +53,17 @@ int split(int *list, int iLeft, int iRight) {
     return leftPointer; //This is the current index of the pivot, and is used to split the list. 
 }
 
-void quicksort(int *list, int iLeft, int iRight) {
-    if (iRight - iLeft > 24) {
+void quicksort(struct qsargs args) {
+    int *list = args.list;
+    int iLeft = args.iLeft;
+    int iRight = args.iRight;
+    if (args.iRight - args.iLeft > 24) {
         int pivot = split(list, iLeft, iRight);
-        quicksort(list, iLeft, pivot - 1);
-        quicksort(list, pivot + 1, iRight);
+        args.iRight = pivot - 1;
+        quicksort(args);
+        args.iRight = iRight;
+        args.iLeft = pivot + 1;
+        quicksort(args);
     } else { //At 25 elements, the algorithm switches to insertionsort. 
         insertionSort(list, iLeft, iRight);
     }
@@ -61,6 +74,23 @@ int isSortedCorrectly(int *list, int length) {
         if (list[i] > list[i + 1]) return 0;
     }
     return 1;
+}
+
+//Stub
+void startSorting(int *list, int l, int r) {
+    int pivot = split(list, l, r);
+    struct qsargs args;
+    args.list = list;
+    args.iLeft = l;
+    args.iRight = pivot - 1;
+    pthread_t thread;
+    pthread_create(&thread, NULL, quicksort, &args);
+    struct qsargs args2;
+    args2.iLeft = pivot + 1;
+    args2.iRight = r;
+    args2.list = list;
+    quicksort(args2);
+    pthread_join(thread, NULL);
 }
 
 int main() {
@@ -74,7 +104,7 @@ int main() {
         for (int i = 0; i < listLength; i++) {
             test[i] = rand();
         }
-        quicksort(test, 0, listLength - 1);
+        startSorting(test, 0, listLength - 1);
         if (!isSortedCorrectly(test, listLength)) {
             printf("Incorrect sort!");
             break;
