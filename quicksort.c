@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <time.h>
 
 //Swaps the places of the values at i and j
@@ -9,12 +8,6 @@ void swap(int *i, int *j) {
     *j = *i;
     *i = k;
 }
-
-struct quickSortArgs {
-    int *list;
-    int iLeft;
-    int iRight;
-};
 
 int median3Sort(int *list, int iLeft, int iRight) {
     int mid = (iLeft + iRight) / 2;
@@ -84,9 +77,6 @@ int main() {
         quicksort(test, 0, listLength - 1);
         if (!isSortedCorrectly(test, listLength)) {
             printf("Incorrect sort!");
-            for (int i = 0; i < listLength; i++) {
-                printf("%d ", test[i]);
-            }
             break;
         }
         end = clock();
