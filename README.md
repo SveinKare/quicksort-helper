@@ -12,8 +12,8 @@ This also included the initialization of the array using rand(), and well as a l
 ### Other attempts
 In addition to the insertion sort, multithreading was considered as a possible improvement. 
 The first attempt was to split off the left side of the array into a separate thread, essentially putting half the work into other threads. This proved to be extremely time-consuming, and was discarded. 
-Afterwards, the attempt was made to run just the insertion sort in a separate thread, but this also proved to be quite slow. This is likely due to a poor implementation of threading, as it cause the main thread to wait a lot. 
-
+Afterwards, the attempt was made to run just the insertion sort in a separate thread, but this also proved to be quite slow. This is likely due to a poor implementation of threading, as it cause the main thread to wait a lot.  
+The branch "pivot-test" also gives an alternative where the pivot is selected by sorting the first, last, 1/4- and 3/4-position elements, and returning the second last one. This approach had no noticable effect on performance. Returning the second element (1/4-position) was the same. 
 
 ### Notes
 This code was written as part of an assignment at the Norwegian University of Science and Technology. 
