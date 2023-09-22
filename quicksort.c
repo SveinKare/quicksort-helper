@@ -3,6 +3,7 @@
 #include <time.h>
 #include <pthread.h>
 
+//Struct containing the arguments for the quicksort function. 
 struct qsargs {
     int *list;
     int iLeft;
@@ -70,27 +71,30 @@ void quicksort(struct qsargs args) {
 }
 
 int isSortedCorrectly(int *list, int length) {
+    if (length < 2) return 1;
     for (int i = 0; i < length - 1; i++) {
         if (list[i] > list[i + 1]) return 0;
     }
     return 1;
 }
 
-//Stub
+//This function runs the left side of the array in a new thread, then runs regular quicksort on the right side. Afterwards, it waits for the child thread to finish up. 
 void startSorting(int *list, int l, int r) {
-    int pivot = split(list, l, r);
-    struct qsargs args;
-    args.list = list;
-    args.iLeft = l;
-    args.iRight = pivot - 1;
-    pthread_t thread;
-    pthread_create(&thread, NULL, quicksort, &args);
-    struct qsargs args2;
-    args2.iLeft = pivot + 1;
-    args2.iRight = r;
-    args2.list = list;
-    quicksort(args2);
-    pthread_join(thread, NULL);
+    if (r - l > 24) {
+        int pivot = split(list, l, r);
+        struct qsargs args;
+        args.list = list;
+        args.iLeft = l;
+        args.iRight = pivot - 1;
+        pthread_t thread;
+        pthread_create(&thread, NULL, quicksort, &args);
+        struct qsargs args2;
+        args2.iLeft = pivot + 1;
+        args2.iRight = r;
+        args2.list = list;
+        quicksort(args2);
+        pthread_join(thread, NULL);
+    } else insertionSort(list, l, r);
 }
 
 int main() {
