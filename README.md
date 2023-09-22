@@ -11,12 +11,16 @@ This also included the initialization of the array using rand(), and well as a l
 
 ### Other attempts
 In addition to the insertion sort, multithreading was considered as a possible improvement. 
-The first attempt was to split off the left side of the array into a separate thread, essentially putting half the work into other threads. This proved to be extremely time-consuming, and was discarded. 
+The first attempt was to split off the left side of the array into a separate thread, essentially putting half the work into other threads. This proved to be extremely time-consuming, and was discarded.  
+
 Afterwards, the attempt was made to run just the insertion sort in a separate thread, but this also proved to be quite slow. This is likely due to a poor implementation of threading, as it cause the main thread to wait a lot.  
+
+Finally, a separate function was created to instantiate a single thread. This thread handles the "left side" of the array, while the "right side" is handled by recursion in the main thread. Running this on the same computer as the others on the same array size clocked in at around 76ms, which is a significant improvement. This version is found in the branch "thread-test".  
+
 The branch "pivot-test" also gives an alternative where the pivot is selected by sorting the first, last, 1/4- and 3/4-position elements, and returning the second last one. This approach had no noticable effect on performance. Returning the second element (1/4-position) was the same. 
 
 ### Notes
-This code was written as part of an assignment at the Norwegian University of Science and Technology. 
+Part of this code was written as part of an assignment at the Norwegian University of Science and Technology. 
 
 
 [^1]: Hafting, H. and Ljosland, M. (2003) *Algoritmer og datastrukturer*. 1st ed. Oslo: Gyldendal Akademisk.
