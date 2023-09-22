@@ -10,6 +10,12 @@ void swap(int *i, int *j) {
     *i = k;
 }
 
+struct quickSortArgs {
+    int *list;
+    int iLeft;
+    int iRight;
+};
+
 int median3Sort(int *list, int iLeft, int iRight) {
     int mid = (iLeft + iRight) / 2;
     if (list[iLeft] > list[mid]) swap(&list[iLeft], &list[mid]);
@@ -18,6 +24,18 @@ int median3Sort(int *list, int iLeft, int iRight) {
         if (list[iLeft] > list[mid]) swap(&list[iLeft], &list[mid]);
     }
     return mid; //Returns the index of the pivot
+}
+
+void insertionSort(int *list, int iLeft, int iRight) {
+    for (int j = iLeft + 1; j <= iRight; ++j) {
+        int current = list[j];
+        int i = j - 1;
+        while (i >= 0 && list[i] > current) {
+            list[i + 1] = list[i];
+            --i;
+        }
+        list[i + 1] = current;
+    }
 }
 
 int split(int *list, int iLeft, int iRight) {
@@ -36,11 +54,13 @@ int split(int *list, int iLeft, int iRight) {
 }
 
 void quicksort(int *list, int iLeft, int iRight) {
-    if (iRight - iLeft > 2) {
+    if (iRight - iLeft > 24) {
         int pivot = split(list, iLeft, iRight);
         quicksort(list, iLeft, pivot - 1);
         quicksort(list, pivot + 1, iRight);
-    } else median3Sort(list, iLeft, iRight);
+    } else { //At 25 elements, the algorithm switches to insertionsort. 
+        insertionSort(list, iLeft, iRight);
+    }
 }
 
 int isSortedCorrectly(int *list, int length) {
@@ -51,17 +71,24 @@ int isSortedCorrectly(int *list, int length) {
 }
 
 int main() {
-    int *test = (int *) malloc(1000000 * sizeof(int));
+    const int listLength = 1000000;
+    int *test = (int *) malloc(listLength * sizeof(int));
     clock_t start, end;
     int rounds = 0;
     start = clock();
 
     while ( ((double) (end - start)) / CLOCKS_PER_SEC < 10.0 ) {
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < listLength; i++) {
             test[i] = rand();
         }
-        quicksort(test, 0, 999999);
-        if (!isSortedCorrectly(test, 1000000)) break;
+        quicksort(test, 0, listLength - 1);
+        if (!isSortedCorrectly(test, listLength)) {
+            printf("Incorrect sort!");
+            for (int i = 0; i < listLength; i++) {
+                printf("%d ", test[i]);
+            }
+            break;
+        }
         end = clock();
         rounds++;
     }
